@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-chtml.js">
+</script>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Hierarchical World Models with Implicit Dynamics">
+  <meta property="og:description" content="Hierarchical World Models with Implicit Dynamics">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Hierarchical World Models with Implicit Dynamics">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hierarchical World Models with Implicit Dynamics">
+  <meta name="twitter:description"
+    content="Hierarchical World Models with Implicit Dynamics">
+  <link rel="shortcut icon" href="mfiles/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/simple-grid.css">
+  <title>Hierarchical World Models with Implicit Dynamics</title>
+</head>
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+  <div class="jumbotron">
+    <div class="container">
+      <div class="row mt-5" >
+        <div class="col-12 center mb-3">
+          <h1 style="font-size: 2.9em;">
+            <b>Hierarchical World Models with</b>
+          </h1>  
+          <h1 style="font-size: 2.8em;">
+            <b>Implicit Dynamics</b>
+          </h1>        
+        </div>
+      </div>
+
+      <!--High-level Subgoals Image-->
+      <div class="row mt-5">
+        <div class="col-12 center img">
+          <!-- <img class="center" src="./mfiles/teaser_resize.gif" style="width:100%; height:auto; overflow:visible;"></img> -->
+           <iframe
+            class="center"
+            data-src="./mfiles/teaser/index.html" src=""
+            style="width:100%; max-width:1400px; aspect-ratio: 1400 / 600; max-height:100vh; border:none; display:block; margin:0 auto; overflow:visible; background:transparent;">
+          </iframe>
+          <div style="position: absolute; inset: 0;"></div>
+          <p style="text-align: center; margin-top: 10px;"><i>ID-WM</i></p>
+        </div>
+      </div>
+
+      <!--Abstract-->
+      <div class="row mt-5">
+        <div class="col-12">
+          <h2 class="center m-bottom">Abstract</h2>
+          <p>
+            Planning with world models enables test-time adaptation for embodied agents, offering superior generalization over direct policy learning. However, long-horizon tasks remain hindered by cumulative errors and search complexity. Existing hierarchical methods often use rigid macro-actions or latent skills, leading to brittle representations and limited fine-grained control. We introduce <b>ID-WM</b> (Implicit Dynamics World Models), a hierarchical world model that decouples state-space reachability from local control. Our framework utilizes a high-level model to sample feasible transitions across the state manifold and a low-level world model as inverse dynamics solver to ground these transitions into precise actions. This allows the planner to identify reachable subgoals without being constrained by low-level execution details. By prioritizing local physical feasibility over global behavioral patterns, ID-WM synthesizes novel long-horizon plans from short segments, transcending the specific behavioral modes seen during training. We demonstrate its effectiveness across three navigation and manipulation suites, achieving a 38.5% improvement over state-of-the-art policy and diffusion-based planners. Crucially, by leveraging this hierarchical structure to mitigate compounding errors, our approach yields a 120% performance gain over single-level world model MPC, particularly in complex, unseen configurations for long-horizon tasks. Videos can be viewed at <a href="https://anon-id-wm.github.io">https://anon-id-wm.github.io</a>.
+          </p>
+        </div>
+      </div>
+
+      <!--Architecture Image-->
+      <div class="row mt-5">
+        <div class="col-12 center img">
+          <!-- <img class="center" src="./mfiles/planning_resize.gif" style="width:100%; height:auto; overflow:visible;"></img> -->
+           <iframe
+            class="center"
+            data-src="./mfiles/method/index.html" src=""
+            style="width:100%; max-width:1400px; aspect-ratio: 1400 / 600; max-height:100vh; border:none; display:block; margin:0 auto; overflow:visible; background:transparent;">
+          </iframe>
+          <div style="position: absolute; inset: 0;"></div>
+          <p style="text-align: center; margin-top: 10px;"><i>Architecture of ID-WM</i></p>
+        </div>
+      </div>
+
+      <!--Method Section-->
+      <div class="row mt-5">
+        <div class="col-12">
+          <h2 class="center mb-3">Method</h2>
+          <p>
+            In this paper, we introduce <b>ID-WM</b>, a hierarchical world model with implicit dynamics grounded in the insight that effective planning requires decoupling topological reachability from execution details. <b>ID-WM</b> consists of a high-level diffusion-based world model that only implicitly models the dynamics by outputting states that are within a fixed distance away from the current state, functioning as a <i>neighboring state generator</i>, and a deterministic low-level model conditioned on both current state and action, acting as an <i>inverse dynamics solver</i>. Conditioned on the current state and a Gaussian noise, the high-level model leverages the generative power of diffusion to map a tractable unit Gaussian latent space to the manifold of feasible neighboring states. This formulation allows us to treat the noise as an implicit high-level action, enabling the planner to search over a well-behaved distribution instead of complex, discontinuous skill spaces to reason purely about "where to go," while the low-level model recovers the precise executable actions for "how to get there."
+          </p>
+        </div>
+      </div>
+
+      <!--Diverse Plans Image-->
+      <div class="row mt-5">
+        <div class="col-12 center img">
+          <img class="center" src="./mfiles/diverse_plans.png" style="width:100%; height:auto; overflow:visible;"></img>
+          <p style="text-align: center; margin-top: 10px;"><i>Diverse high-level planning of ID-WM</i></p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="center mb-3">Long Horizong Planning with ID-WM</h2>
+          <p>*For all the images and videos below, the top row shows ground truth rollouts in the environment, while the bottom row presents world model-imagined rollouts. The images on the right represent the goal states in both cases.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content" style="padding-bottom: 0px;"> 
+      <div class="container">
+        <div class="grid-display" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/pusht_aug_random_state_17_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">PushT Random State</h4>
+            </div>
+          </div>
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/pusht_aug_fix_goal_17_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">PushT Fix Goal</h4>
+            </div>
+          </div>
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/wall_9_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">Wall</h4>
+            </div>
+          </div>
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/maze_u_1_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">U-Maze</h4>
+            </div>
+          </div>
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/maze_medium_0_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">Medium Maze</h4>
+            </div>
+          </div>
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/maze_large_18_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">Large Maze</h4>
+            </div>
+          </div>
+          <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <video class="img-fluid" style="width: 100%; height: auto;" muted autoplay playsinline>
+              <source src="./mfiles/media/ours_all/maze_giant_15_success_ours.mp4" type="video/mp4">
+            </video>
+            <div style="text-align: center;">
+              <h4 class="with-whitebackdrop">Giant Maze</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--Baselines-->
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="center mb-3">Comparing Planning Performance with Baselines</h2>
+          <p>*For the Wall, Push-T, Giant Maze, Large Maze, Medium Maze, and U-Maze environments, we randomly sample initial and goal states from each environment's state space. For Push-T, the fixed-goal setting samples a random initial state while using the environment's fixed goal location.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="body-content" style="padding-bottom: 0px;">
+      <div class="container">
+        <!--Baselines: PushT (Random State)-->
+        <h3>PushT (Random State):</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 5px;">
+            <div id="carousel-pusht-random" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-pusht-random" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-pusht-random" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-pusht-random" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-pusht-random" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-pusht-random" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;">
+                      <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay controls>
+                        <source src="./mfiles/media/ours_diverse_all/pusht_random_state/FINAL_out1_17_success.mp4" type="video/mp4">
+                      </video>
+                      <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;">
+                        <span>Random Goal</span>
+                        <span>Execution from Random Init</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_random_state/FINAL_out1_8_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Random Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_random_state/FINAL_out1_0_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Random Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_random_state/FINAL_out1_5_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Random Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 4 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_random_state/FINAL_out1_6_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Random Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 5 <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-pusht-random" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-pusht-random" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/pusht_random_state/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_random_state/ours_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Ours</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_random_state/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_random_state/gcbc_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_random_state/diffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_random_state/hdiffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_random_state/sl_wm_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+        <!--Baselines: PushT (Fix Goal)-->
+        <h3>PushT (Fix Goal):</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 10px;">
+            <div id="carousel-pusht-fix" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_fix_goal/FINAL_out1_1_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init, Fixed Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_fix_goal/FINAL_out1_11_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init, Fixed Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_fix_goal/FINAL_out1_19_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init, Fixed Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_fix_goal/FINAL_out1_10_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init, Fixed Goal 4 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <div style="position: relative; display: inline-block; margin: auto;"><video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/pusht_fix_goal/FINAL_out1_6_success.mp4" type="video/mp4">
+                    </video>
+                  <div style="position: absolute; top: 12px; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; color: #aaaaaae4; text-align: center; pointer-events: none;"><span>Goal</span><span>Execution from Random Init</span></div></div></div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init, Fixed Goal 5 <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-pusht-fix" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/pusht_fix_goal/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_fix_goal/ours_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Ours</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_fix_goal/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_fix_goal/gcbc_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_fix_goal/diffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_fix_goal/hdiffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/pusht_fix_goal/sl_wm_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <h3>Wall:</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 10px;">
+            <div id="carousel-wall" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-wall" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-wall" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-wall" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-wall" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-wall" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/wall/FINAL_out1_0_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/wall/FINAL_out1_5_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/wall/FINAL_out1_7_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/wall/FINAL_out1_9_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 4 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/wall/FINAL_out1_15_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 5 <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-wall" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-wall" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/wall/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/wall/ours_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Ours</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/wall/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/wall/gcbc_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/wall/diffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/wall/hdiffuser_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/wall/sl_wm_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+        <h3>U-Maze:</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 10px;">
+            <div id="carousel-maze-u" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-maze-u" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-maze-u" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-maze-u" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-maze-u" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-maze-u" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_u/FINAL_out1_1_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_u/FINAL_out1_11_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_u/FINAL_out1_2_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_u/FINAL_out1_16_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 4 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_u/FINAL_out1_0_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 5 <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-maze-u" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-maze-u" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_u/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_u/ours_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Ours</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_u/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_u/gcbc_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_u/diffuser_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_u/hdiffuser_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_u/sl_wm_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+        <h3>Medium Maze:</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 10px;">
+            <div id="carousel-maze-medium" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-maze-medium" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-maze-medium" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-maze-medium" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-maze-medium" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-maze-medium" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_medium/FINAL_out1_0_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_medium/FINAL_out1_3_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_medium/FINAL_out1_4_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_medium/FINAL_out1_8_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 4 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_medium/FINAL_out1_13_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 5 <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-maze-medium" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-maze-medium" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_medium/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_medium/ours_success.mp4" type="video/mp4">
+              </video>
+              <div class="caption">
+                <h4 class="method-name">Ours</h4>
+                <span class="status success">Success</span>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_medium/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_medium/gcbc_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_medium/diffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_medium/hdiffuser_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_medium/sl_wm_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <h3>Large Maze:</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 10px;">
+            <div id="carousel-maze-large" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-maze-large" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-maze-large" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-maze-large" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-maze-large" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-maze-large" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_large/FINAL_out1_0_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_large/FINAL_out1_18_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_large/FINAL_out1_3_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_large/FINAL_out1_6_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 4 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_large/FINAL_out1_1_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 5 <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-maze-large" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-maze-large" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_large/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_large/ours_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Ours</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_large/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_large/gcbc_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_large/diffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_large/hdiffuser_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_large/sl_wm_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+        <h3>Giant Maze:</h3>
+          <h5 style="text-align:left; color:#666;">
+            Ours: Generalizing to Arbitrary Goals
+          </h5>
+          <div class="carousel-column" style="flex: 0 0 45%; padding: 10px;">
+            <div id="carousel-maze-giant" class="carousel slide" data-bs-ride="false">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carousel-maze-giant" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carousel-maze-giant" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carousel-maze-giant" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel-maze-giant" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carousel-maze-giant" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_giant/FINAL_out1_0_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 1 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_giant/FINAL_out1_3_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 2 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_giant/FINAL_out1_1_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 3 <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_giant/FINAL_out1_18_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 4  <span class="status success">Success</span></h4></div>
+                </div>
+                <div class="carousel-item">
+                  <div style="display: flex; justify-content: center; max-height: 250px; max-width: 100%; overflow: hidden;">
+                    <video class="img-fluid" style="max-height: 250px; margin: auto;" muted autoplay>
+                      <source src="./mfiles/media/ours_diverse_all/maze_giant/FINAL_out1_16_success.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div style="text-align: center;"><h4 class="caption with-whitebackdrop">Random Init and Goal 5  <span class="status success">Success</span></h4></div>
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-maze-giant" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-maze-giant" data-bs-slide="next">
+                <span class="carousel-control-next-icon with-backdrop" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <h5 style="text-align:left; color:#666; margin-top:10px;">
+            Comparison with Baselines
+          </h5>
+          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_giant/goal.png" alt="Goal">
+              <div style="text-align: center;">
+                <h4 class="with-whitebackdrop">Goal</h4>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_giant/ours_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Ours</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_giant/hiql_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">HIQL</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_giant/gcbc_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">GCBC</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_giant/diffuser_fail.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">Diffuser</h4>
+                  <span class="status failure">Failure</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_giant/hdiffuser_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">H-Diffuser</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+              <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
+                <source src="./mfiles/media/baselines_all/maze_giant/sl_wm_success.mp4" type="video/mp4">
+              </video>
+              <div style="text-align: center;">
+                <div class="caption">
+                  <h4 class="method-name">SL-WM</h4>
+                  <span class="status success">Success</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+  </div>
+  <div style="height: 20px;"></div>
+
+  <script>
+  document.querySelectorAll('.img-fluid').forEach(video => {
+    let userInteracting = false;
+    video.controls = false;
+
+    video.addEventListener('mouseenter', () => {
+      userInteracting = true;
+      video.controls = true;
+    });
+
+    video.addEventListener('mouseleave', () => {
+      userInteracting = false;
+      video.controls = false;
+    });
+
+    video.addEventListener('ended', () => {
+      if (userInteracting) return;
+
+      setTimeout(() => {
+        video.currentTime = 0;
+
+        setTimeout(() => {
+          video.play();
+        }, 1000);
+      }, 1000);
+    });
+  });
+  </script>
+
+  <script>
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        e.target.src = e.isIntersecting ? e.target.dataset.src : '';
+      });
+    }, {threshold: 0.2});
+
+    document.querySelectorAll('iframe[data-src]').forEach(el => obs.observe(el));
+</script>
+
+</body>
+
+</html>
