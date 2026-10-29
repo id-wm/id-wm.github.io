@@ -18,34 +18,181 @@
   <link rel="shortcut icon" href="mfiles/favicon.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/simple-grid.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --nyu-purple: #57068C;
+      --nyu-purple-dark: #3D0063;
+      --nyu-purple-light: #7A29A8;
+      --bg: #ffffff;
+      --text: #333447;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+
+    body { background-color: var(--bg); }
+
+    * { font-family: 'Roboto Slab', Georgia, serif; }
+
+    a { color: var(--nyu-purple); text-decoration: none; }
+    a:hover { color: var(--nyu-purple-light); text-decoration: underline; }
+    a * { color: inherit; }
+
+    p { font-weight: 300; }
+
+    h2 { color: var(--nyu-purple-dark); font-weight: 700; }
+    h3 { color: var(--nyu-purple-dark); font-weight: 500; margin-top: 2.5rem; }
+
+    /* Nav */
+    #nav {
+      position: sticky; top: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      padding: 0.6rem 1.5rem;
+      background-color: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(87, 6, 140, 0.1);
+    }
+    #nav .nav-brand { font-size: 1.5rem; font-weight: 700; color: var(--nyu-purple-dark); }
+    #nav .nav-links a { margin-left: 1.25rem; font-size: 1.1rem; color: var(--text); }
+    #nav .nav-links a:hover { color: var(--nyu-purple); text-decoration: none; }
+
+    /* Hero */
+    .hero-title {
+      font-size: 3.1rem; line-height: 1.25; font-weight: 400;
+      color: var(--nyu-purple-dark);
+    }
+    .hero-title strong { font-weight: 700; color: inherit; }
+    .authors {
+      text-align: center; font-size: 1.25rem; font-weight: 500;
+      line-height: 1.9; margin: 1rem 0 0.4rem;
+    }
+    .authors a { white-space: nowrap; }
+    .affiliations { text-align: center; font-size: 1rem; margin-bottom: 0.8rem; }
+    .affiliations span { display: inline-block; margin: 0 1.25rem; }
+    .venue { text-align: center; margin-bottom: 0.5rem; }
+    .venue span {
+      display: inline-block; padding: 0.35rem 1.1rem; border-radius: 999px;
+      background-color: var(--nyu-purple); color: white;
+      font-size: 1.1rem; font-weight: 500; letter-spacing: 0.02em;
+      box-shadow: 0 2px 6px rgba(87, 6, 140, 0.2);
+    }
+    .correspondence { text-align: center; font-size: 0.95rem; }
+    .link-buttons {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin: 1rem 0 0.5rem;
+    }
+    .link-btn {
+      display: inline-block; padding: 0.5rem 1.4rem; border-radius: 6px;
+      background-color: var(--nyu-purple); color: white; font-size: 1.05rem; font-weight: 500;
+      box-shadow: 0 2px 6px rgba(87, 6, 140, 0.2);
+    }
+    .link-btn:hover { background-color: var(--nyu-purple-light); color: white; text-decoration: none; }
+    .link-btn.is-disabled {
+      background-color: #e6e1ea; color: #7a7383; box-shadow: none; cursor: default;
+    }
+
+    /* BibTeX */
+    .bibtex-box { position: relative; }
+    .bibtex-box pre {
+      background: #f6f4f8; border: 1px solid rgba(87, 6, 140, 0.15); border-radius: 8px;
+      padding: 1rem 1.25rem; font-size: 0.9rem; overflow-x: auto; margin: 0;
+    }
+    .bibtex-box pre, .bibtex-box pre * { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    @media screen and (max-width: 767px) {
+      .hero-title { font-size: 7vw; }
+      .authors { font-size: 1.05rem; }
+      #nav .nav-links a { margin-left: 0.75rem; font-size: 0.95rem; }
+    }
+
+    /* Media */
+    video, img { border-radius: 12px; }
+    img { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    .with-whitebackdrop { font-weight: 400; }
+
+    /* Full-width figures exported from Keynote */
+    .figure-media {
+      display: block; width: 100%; max-width: 1400px; height: auto; margin: 0 auto;
+      border-radius: 0; box-shadow: none;
+    }
+
+    /* Baseline picker */
+    .baseline-head {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 0.5rem 1rem; margin: 1rem 0 0.75rem;
+    }
+    .baseline-head h5 { margin: 0; color: #666; }
+    .segmented {
+      display: inline-flex; flex-wrap: wrap; overflow: hidden;
+      border: 1px solid rgba(87, 6, 140, 0.35); border-radius: 6px; font-size: 0.9rem;
+    }
+    .segmented button {
+      border: 0; background: none; color: #666; padding: 0.4rem 1rem; cursor: pointer;
+    }
+    .segmented button + button { border-left: 1px solid rgba(87, 6, 140, 0.35); }
+    .segmented button:hover { color: var(--nyu-purple); }
+    .segmented button[aria-pressed="true"] { background: var(--nyu-purple); color: white; font-weight: 500; }
+    .baseline-grid.grid-display { justify-content: center !important; gap: 1rem !important; }
+    .baseline-grid .video-container { flex: 0 1 30% !important; }
+    .baseline-grid .video-container.is-hidden { display: none; }
+  </style>
   <title>Hierarchical World Models with Implicit Dynamics</title>
 </head>
 
 <body>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
-  <div class="jumbotron">
+  <nav id="nav">
+    <a class="nav-brand" href="#intro">ID-WM</a>
+    <div class="nav-links">
+      <a href="#abstract">Abstract</a>
+      <a href="#method">Method</a>
+      <a href="#planning">Results</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
+  </nav>
+
+  <div class="jumbotron" id="intro">
     <div class="container">
-      <div class="row mt-5" >
-        <div class="col-12 center mb-3">
-          <h1 style="font-size: 2.9em;">
-            <b>Hierarchical World Models with</b>
-          </h1>  
-          <h1 style="font-size: 2.8em;">
-            <b>Implicit Dynamics</b>
-          </h1>        
+      <div class="row mt-5">
+        <div class="col-12 center mb-2">
+          <h1 class="hero-title"><strong>ID-WM</strong>: Hierarchical World Models with Implicit Dynamics</h1>
+        </div>
+      </div>
+
+      <!--Authors-->
+      <div class="row">
+        <div class="col-12 center">
+          <p class="authors">
+            <a href="https://gaoyuezhou.github.io/" target="_blank">Gaoyue Zhou<sup>1,2</sup></a>,
+            <a href="https://yvonne511.github.io/" target="_blank">Yvonne Wu<sup>1</sup></a>,
+            <a href="https://jeffcui.com/" target="_blank">Zichen Jeff Cui<sup>1</sup></a>
+            <br>
+            <a href="https://scholar.google.com/citations?user=euUV4iUAAAAJ" target="_blank">Nicolas Ballas<sup>2</sup></a>,
+            <a href="https://www.midoassran.ca/" target="_blank">Mido Assran<sup>2</sup></a>,
+            <a href="https://www.lerrelpinto.com/" target="_blank">Lerrel Pinto<sup>1</sup></a>,
+            <a href="http://yann.lecun.com/" target="_blank">Yann LeCun<sup>1,3</sup></a>
+          </p>
+          <p class="affiliations">
+            <span>1. Courant Institute, New York University</span>
+            <span>2. Meta-FAIR</span>
+            <span>3. AMI Labs</span>
+          </p>
+          <p class="venue"><span>NeurIPS 2026</span></p>
+          <p class="correspondence">Correspondence: <a href="mailto:gz2123@nyu.edu">gz2123@nyu.edu</a></p>
+          <div class="link-buttons">
+            <a class="link-btn" href="https://arxiv.org/abs/TODO" target="_blank" rel="noopener noreferrer">arXiv</a>
+            <span class="link-btn is-disabled" aria-disabled="true">Code (coming soon)</span>
+            <a class="link-btn" href="#bibtex">BibTeX</a>
+          </div>
         </div>
       </div>
 
       <!--High-level Subgoals Image-->
       <div class="row mt-5">
         <div class="col-12 center img">
-          <!-- <img class="center" src="./mfiles/teaser_resize.gif" style="width:100%; height:auto; overflow:visible;"></img> -->
-           <iframe
-            class="center"
-            data-src="./mfiles/teaser/index.html" src=""
-            style="width:100%; max-width:1400px; aspect-ratio: 1400 / 600; max-height:100vh; border:none; display:block; margin:0 auto; overflow:visible; background:transparent;">
-          </iframe>
-          <div style="position: absolute; inset: 0;"></div>
+          <video class="figure-media" src="./mfiles/figures/teaser.mp4" poster="./mfiles/figures/teaser_poster.png"
+            width="2760" height="870" autoplay muted loop playsinline preload="auto"></video>
           <p style="text-align: center; margin-top: 10px;"><i>ID-WM</i></p>
         </div>
       </div>
@@ -53,9 +200,9 @@
       <!--Abstract-->
       <div class="row mt-5">
         <div class="col-12">
-          <h2 class="center m-bottom">Abstract</h2>
+          <h2 class="center m-bottom" id="abstract">Abstract</h2>
           <p>
-            Planning with world models enables test-time adaptation for embodied agents, offering superior generalization over direct policy learning. However, long-horizon tasks remain hindered by cumulative errors and search complexity. Existing hierarchical methods often use rigid macro-actions or latent skills, leading to brittle representations and limited fine-grained control. We introduce <b>ID-WM</b> (Implicit Dynamics World Models), a hierarchical world model that decouples state-space reachability from local control. Our framework utilizes a high-level model to sample feasible transitions across the state manifold and a low-level world model as inverse dynamics solver to ground these transitions into precise actions. This allows the planner to identify reachable subgoals without being constrained by low-level execution details. By prioritizing local physical feasibility over global behavioral patterns, ID-WM synthesizes novel long-horizon plans from short segments, transcending the specific behavioral modes seen during training. We demonstrate its effectiveness across three navigation and manipulation suites, achieving a 38.5% improvement over state-of-the-art policy and diffusion-based planners. Crucially, by leveraging this hierarchical structure to mitigate compounding errors, our approach yields a 120% performance gain over single-level world model MPC, particularly in complex, unseen configurations for long-horizon tasks. Videos can be viewed at <a href="https://anon-id-wm.github.io">https://anon-id-wm.github.io</a>.
+            Planning with world models enables test-time adaptation for embodied agents, offering superior generalization over direct policy learning. However, long-horizon tasks remain hindered by cumulative errors and search complexity. Existing hierarchical methods often use rigid macro-actions or latent skills, leading to brittle representations and limited fine-grained control. We introduce <b>ID-WM</b> (Implicit Dynamics World Models), a hierarchical world model that decouples state-space reachability from local control. Our framework utilizes a high-level model to sample feasible transitions across the state manifold and a low-level world model as inverse dynamics solver to ground these transitions into precise actions. This allows the planner to identify reachable subgoals without being constrained by low-level execution details. By prioritizing local physical feasibility over global behavioral patterns, ID-WM synthesizes novel long-horizon plans from short segments, transcending the specific behavioral modes seen during training. We demonstrate its effectiveness across three navigation and manipulation suites, achieving a 38.5% improvement over state-of-the-art policy and diffusion-based planners. Crucially, by leveraging this hierarchical structure to mitigate compounding errors, our approach yields a 135% performance gain over single-level world model MPC, particularly in complex, unseen configurations for long-horizon tasks. Videos can be viewed at <a href="https://id-wm.github.io">https://id-wm.github.io</a>.
           </p>
         </div>
       </div>
@@ -63,13 +210,8 @@
       <!--Architecture Image-->
       <div class="row mt-5">
         <div class="col-12 center img">
-          <!-- <img class="center" src="./mfiles/planning_resize.gif" style="width:100%; height:auto; overflow:visible;"></img> -->
-           <iframe
-            class="center"
-            data-src="./mfiles/method/index.html" src=""
-            style="width:100%; max-width:1400px; aspect-ratio: 1400 / 600; max-height:100vh; border:none; display:block; margin:0 auto; overflow:visible; background:transparent;">
-          </iframe>
-          <div style="position: absolute; inset: 0;"></div>
+          <video class="figure-media" src="./mfiles/figures/method.mp4" poster="./mfiles/figures/method_poster.png"
+            width="3700" height="1530" autoplay muted loop playsinline preload="auto"></video>
           <p style="text-align: center; margin-top: 10px;"><i>Architecture of ID-WM</i></p>
         </div>
       </div>
@@ -77,7 +219,7 @@
       <!--Method Section-->
       <div class="row mt-5">
         <div class="col-12">
-          <h2 class="center mb-3">Method</h2>
+          <h2 class="center mb-3" id="method">Method</h2>
           <p>
             In this paper, we introduce <b>ID-WM</b>, a hierarchical world model with implicit dynamics grounded in the insight that effective planning requires decoupling topological reachability from execution details. <b>ID-WM</b> consists of a high-level diffusion-based world model that only implicitly models the dynamics by outputting states that are within a fixed distance away from the current state, functioning as a <i>neighboring state generator</i>, and a deterministic low-level model conditioned on both current state and action, acting as an <i>inverse dynamics solver</i>. Conditioned on the current state and a Gaussian noise, the high-level model leverages the generative power of diffusion to map a tractable unit Gaussian latent space to the manifold of feasible neighboring states. This formulation allows us to treat the noise as an implicit high-level action, enabling the planner to search over a well-behaved distribution instead of complex, discontinuous skill spaces to reason purely about "where to go," while the low-level model recovers the precise executable actions for "how to get there."
           </p>
@@ -97,7 +239,7 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <h2 class="center mb-3">Long Horizong Planning with ID-WM</h2>
+          <h2 class="center mb-3" id="planning">Long-Horizon Planning with ID-WM</h2>
           <p>*For all the images and videos below, the top row shows ground truth rollouts in the environment, while the bottom row presents world model-imagined rollouts. The images on the right represent the goal states in both cases.</p>
         </div>
       </div>
@@ -170,7 +312,7 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <h2 class="center mb-3">Comparing Planning Performance with Baselines</h2>
+          <h2 class="center mb-3" id="baselines">Comparing Planning Performance with Baselines</h2>
           <p>*For the Wall, Push-T, Giant Maze, Large Maze, Medium Maze, and U-Maze environments, we randomly sample initial and goal states from each environment's state space. For Push-T, the fixed-goal setting samples a random initial state while using the environment's fixed goal location.</p>
         </div>
       </div>
@@ -251,17 +393,18 @@
             </div>
           </div>
 
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 15%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/pusht_random_state/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_random_state/ours_success.mp4" type="video/mp4">
               </video>
@@ -272,7 +415,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_random_state/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -283,7 +426,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_random_state/gcbc_fail.mp4" type="video/mp4">
               </video>
@@ -294,7 +437,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_random_state/diffuser_fail.mp4" type="video/mp4">
               </video>
@@ -305,7 +448,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_random_state/hdiffuser_fail.mp4" type="video/mp4">
               </video>
@@ -316,7 +459,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_random_state/sl_wm_fail.mp4" type="video/mp4">
               </video>
@@ -395,17 +538,18 @@
               </button>
             </div>
           </div>
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 14%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/pusht_fix_goal/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 14%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_fix_goal/ours_success.mp4" type="video/mp4">
               </video>
@@ -416,7 +560,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 14%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_fix_goal/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -427,7 +571,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 14%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_fix_goal/gcbc_success.mp4" type="video/mp4">
               </video>
@@ -438,7 +582,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 14%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_fix_goal/diffuser_fail.mp4" type="video/mp4">
               </video>
@@ -449,7 +593,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 14%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_fix_goal/hdiffuser_fail.mp4" type="video/mp4">
               </video>
@@ -460,7 +604,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 14%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 14%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/pusht_fix_goal/sl_wm_fail.mp4" type="video/mp4">
               </video>
@@ -538,17 +682,18 @@
               </button>
             </div>
           </div>
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 15%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/wall/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/wall/ours_success.mp4" type="video/mp4">
               </video>
@@ -559,7 +704,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/wall/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -570,7 +715,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/wall/gcbc_success.mp4" type="video/mp4">
               </video>
@@ -581,7 +726,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/wall/diffuser_fail.mp4" type="video/mp4">
               </video>
@@ -592,7 +737,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/wall/hdiffuser_success.mp4" type="video/mp4">
               </video>
@@ -603,7 +748,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/wall/sl_wm_success.mp4" type="video/mp4">
               </video>
@@ -681,17 +826,18 @@
               </button>
             </div>
           </div>
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 15%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_u/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_u/ours_success.mp4" type="video/mp4">
               </video>
@@ -702,7 +848,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_u/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -713,7 +859,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_u/gcbc_success.mp4" type="video/mp4">
               </video>
@@ -724,7 +870,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_u/diffuser_success.mp4" type="video/mp4">
               </video>
@@ -735,7 +881,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_u/hdiffuser_success.mp4" type="video/mp4">
               </video>
@@ -746,7 +892,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_u/sl_wm_success.mp4" type="video/mp4">
               </video>
@@ -824,17 +970,18 @@
               </button>
             </div>
           </div>
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 15%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_medium/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_medium/ours_success.mp4" type="video/mp4">
               </video>
@@ -843,7 +990,7 @@
                 <span class="status success">Success</span>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_medium/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -854,7 +1001,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_medium/gcbc_success.mp4" type="video/mp4">
               </video>
@@ -865,7 +1012,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_medium/diffuser_fail.mp4" type="video/mp4">
               </video>
@@ -876,7 +1023,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_medium/hdiffuser_success.mp4" type="video/mp4">
               </video>
@@ -887,7 +1034,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_medium/sl_wm_success.mp4" type="video/mp4">
               </video>
@@ -965,17 +1112,18 @@
               </button>
             </div>
           </div>
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 15%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_large/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_large/ours_success.mp4" type="video/mp4">
               </video>
@@ -986,7 +1134,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_large/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -997,7 +1145,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_large/gcbc_fail.mp4" type="video/mp4">
               </video>
@@ -1008,7 +1156,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_large/diffuser_fail.mp4" type="video/mp4">
               </video>
@@ -1019,7 +1167,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_large/hdiffuser_success.mp4" type="video/mp4">
               </video>
@@ -1030,7 +1178,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 15%; margin: 0;">
               <video class="img baseline-video" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_large/sl_wm_fail.mp4" type="video/mp4">
               </video>
@@ -1108,17 +1256,18 @@
               </button>
             </div>
           </div>
-          <h5 style="text-align:left; color:#666; margin-top:10px;">
-            Comparison with Baselines
-          </h5>
-          <div class="grid-display mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
+          <div class="baseline-head">
+            <h5>Comparison with Baselines</h5>
+            <div class="segmented baseline-picker" role="group" aria-label="Baseline"><button type="button" data-method="HIQL" aria-pressed="true">HIQL</button><button type="button" data-method="GCBC" aria-pressed="false">GCBC</button><button type="button" data-method="Diffuser" aria-pressed="false">Diffuser</button><button type="button" data-method="H-Diffuser" aria-pressed="false">H-Diffuser</button><button type="button" data-method="SL-WM" aria-pressed="false">SL-WM</button></div>
+          </div>
+          <div class="grid-display baseline-grid mb-5" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div class="video-container" style="flex: 1 1 15%; margin: 0;">
               <img class="img" style="width: 100%; height: auto;" src="./mfiles/media/baselines_all/maze_giant/goal.png" alt="Goal">
               <div style="text-align: center;">
                 <h4 class="with-whitebackdrop">Goal</h4>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="Ours" style="flex: 1 1 15%; margin: 0;">
               <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_giant/ours_success.mp4" type="video/mp4">
               </video>
@@ -1129,7 +1278,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container" data-method="HIQL" style="flex: 1 1 15%; margin: 0;">
               <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_giant/hiql_fail.mp4" type="video/mp4">
               </video>
@@ -1140,7 +1289,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="GCBC" style="flex: 1 1 15%; margin: 0;">
               <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_giant/gcbc_success.mp4" type="video/mp4">
               </video>
@@ -1151,7 +1300,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_giant/diffuser_fail.mp4" type="video/mp4">
               </video>
@@ -1162,7 +1311,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="H-Diffuser" style="flex: 1 1 15%; margin: 0;">
               <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_giant/hdiffuser_success.mp4" type="video/mp4">
               </video>
@@ -1173,7 +1322,7 @@
                 </div>
               </div>
             </div>
-            <div class="video-container" style="flex: 1 1 15%; margin: 0;">
+            <div class="video-container is-hidden" data-method="SL-WM" style="flex: 1 1 15%; margin: 0;">
               <video class="img" style="width: 100%; height: auto;" muted autoplay controls>
                 <source src="./mfiles/media/baselines_all/maze_giant/sl_wm_success.mp4" type="video/mp4">
               </video>
@@ -1189,6 +1338,18 @@
       </div>
     </div>
 
+  </div>
+
+  <!--BibTeX-->
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="center mb-3" id="bibtex">BibTeX</h2>
+        <div class="bibtex-box">
+          <pre id="bibtex-text">Coming soon.</pre>
+        </div>
+      </div>
+    </div>
   </div>
   <div style="height: 20px;"></div>
 
@@ -1221,15 +1382,28 @@
   });
   </script>
 
-  <script>
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        e.target.src = e.isIntersecting ? e.target.dataset.src : '';
-      });
-    }, {threshold: 0.2});
 
-    document.querySelectorAll('iframe[data-src]').forEach(el => obs.observe(el));
-</script>
+  <script>
+    // Baseline picker: show Goal + Ours + the chosen baseline, synced across environments.
+    function selectBaseline(method) {
+      document.querySelectorAll('.baseline-picker button').forEach(b => {
+        b.setAttribute('aria-pressed', b.dataset.method === method ? 'true' : 'false');
+      });
+      document.querySelectorAll('.baseline-grid').forEach(grid => {
+        grid.querySelectorAll('.video-container[data-method]').forEach(c => {
+          const show = c.dataset.method === 'Ours' || c.dataset.method === method;
+          c.classList.toggle('is-hidden', !show);
+          const v = c.querySelector('video');
+          if (!v) return;
+          if (show) { v.currentTime = 0; v.play().catch(() => {}); } else { v.pause(); }
+        });
+      });
+    }
+    document.querySelectorAll('.baseline-picker button').forEach(b => {
+      b.addEventListener('click', () => selectBaseline(b.dataset.method));
+    });
+
+  </script>
 
 </body>
 
